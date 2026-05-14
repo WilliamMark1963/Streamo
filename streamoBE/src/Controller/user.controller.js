@@ -7,24 +7,20 @@ export const registerUser = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
 
-    // Check if user exists
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: "Email already registered" });
 
-    // Hash Password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create User
+    // Just pass the plain password. Mongoose will validate length '8' here.
     const user = await User.create({
       fullName,
       email,
-      password: hashedPassword
+      password 
     });
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    // If validation fails (like password length), it will return the error here
+    res.status(400).json({ message: error.message });
   }
 };
 
