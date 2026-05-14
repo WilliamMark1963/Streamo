@@ -1,10 +1,12 @@
 import React from 'react'
+import { Outlet } from 'react-router-dom'
 
 function App() {
   return (
-    <div className='flex justify-center items-center text-4xl font-bold bg-neutral-800 h-screen text-white'>
-        Streamo App
-    </div>
+<div>
+  
+  <Outlet/>
+</div>
   )
 }
 
