@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
-
+import bcrypt  from 'bcrypt'
 const userSchema = new mongoose.Schema({
   fullName: { 
     type: String, 
@@ -33,15 +33,12 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
   // Only hash the password if it's new or modified
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password')) return;
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
-
-export const User = mongoose.model('User', userSchema);
 
 export const User = mongoose.model('User', userSchema);
