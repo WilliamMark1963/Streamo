@@ -10,9 +10,9 @@ function App() {
       <Header />
       <div className='flex'>
         <Sidebar />
-        <div className='flex-1'>
+<main className='flex-1 w-full overflow-x-hidden'>
           <Outlet />
-        </div>
+        </main>
       </div>
     </div>
   )
