@@ -1,8 +1,9 @@
 import {configureStore} from "@reduxjs/toolkit"
-
-export const store = configureStore({
+import menuReducer from'./menuSlice.js'
+export const appStore = configureStore({
     reducer:{
-
-    },
-    
+        menu:menuReducer
+    },  
 })
+
+export default appStore;
