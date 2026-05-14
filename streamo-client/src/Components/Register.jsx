@@ -43,7 +43,7 @@ function Register() {
 
     try {
       const { data } = await API.post('/register', formData);
-      alert("Registration Successful!");
+      console.log("Result", data.message);
       navigate('/signin');
     } catch (err) {
       setServerError(err.response?.data?.message || "Registration Failed");

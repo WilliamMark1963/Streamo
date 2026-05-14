@@ -29,7 +29,11 @@ const userSchema = new mongoose.Schema({
   profilePicture: { 
     type: String, 
     default: "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-  }
+  },
+  hasChannel: {
+    type: Boolean,
+    default: false
+}
 }, { timestamps: true });
 
 
