@@ -9,6 +9,7 @@ import appStore from "./utils/appStore";
 import SignIn from './Components/SignIn.jsx'
 import Channel from './Components/Channel.jsx'
 import Register from './Components/Register.jsx'
+import CreateChannel from './Components/createChannel.jsx'
 const router = createBrowserRouter([
   {
     path: "/",
@@ -19,11 +20,9 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       { path: "/signin", element: <SignIn/> },
+      { path: "/register", element: <Register />},
       { path: "/channel", element: <Channel/> },
-      {
-        path: "/register",
-        element: <Register />
-      }
+      { path: "/createChannel", element:<CreateChannel/> },
     ]
   }
 ])
