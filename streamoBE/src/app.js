@@ -1,6 +1,7 @@
 import express from 'express';
 import userRoutes from './Routes/user.routes.js'
 import cors from 'cors';
+import channelRouter from './Routes/channel.routes.js'
 
 const app = new express()
 
@@ -16,5 +17,6 @@ app.use(express.json())
 
 // Authentication Routes
 app.use("/", userRoutes)
-
+//Channel Routes
+app.use("/", channelRouter)
 export default app;
