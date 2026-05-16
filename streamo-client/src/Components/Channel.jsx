@@ -13,14 +13,14 @@ function Channel() {
     // Auth & Channel state data from Redux Store
     const { userData, channelData } = useSelector(store => store.user);
 
-    // Bug Fix: If userData is cleared (Sign Out), immediately redirect to home page
+    // Bug Fix Guard: If userData is cleared (Sign Out), immediately redirect to home page
     useEffect(() => {
         if (!userData) {
             navigate("/");
         }
     }, [userData, navigate]);
 
-    // Check if the logged-in visitor is the actual owner of this channel channel page
+    // Check if the logged-in visitor is the actual owner of this channel page
     const isOwner = channelData?._id === id || channelData?.handle === id;
     const currentChannel = isOwner ? channelData : null;
 
@@ -36,7 +36,7 @@ function Channel() {
 
     const [loading, setLoading] = useState(false);
 
-    // Domestic input element tracking layout references
+    // DOM input element tracking references
     const avatarInputRef = useRef(null);
     const bannerInputRef = useRef(null);
     const videoFileInputRef = useRef(null);
@@ -95,7 +95,7 @@ function Channel() {
             const formData = new FormData();
             formData.append("title", videoTitle.trim());
             formData.append("description", videoDescription.trim());
-            formData.append("videoFile", selectedVideoFile); // Match field your backend routes look for
+            formData.append("videoFile", selectedVideoFile); 
 
             const { data } = await API.post(`/channel/${channelData?._id}/uploadVideo`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
@@ -107,11 +107,46 @@ function Channel() {
                 setVideoTitle("");
                 setVideoDescription("");
                 setSelectedVideoFile(null);
-                // Optional: Trigger a dispatch fetch action here to update your videos list grid array
             }
         } catch (err) {
             console.error("Video submission execution failed:", err);
             alert(err.response?.data?.message || "Internal crash while saving content file.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // 5. Complete Channel Deletion & Local Storage/UI Cleanup Handler
+    const handleDeleteChannel = async () => {
+        const confirmDelete = window.confirm("Are you absolutely sure you want to permanently delete your channel? This will wipe your avatar, banner, and all content settings.");
+        if (!confirmDelete) return;
+
+        setLoading(true);
+        try {
+            // Fires an HTTP DELETE to your exact backend endpoint handler code
+            const { data } = await API.delete(`/channel/${channelData?._id}/delete`);
+
+            if (data.success) {
+                // Step 1: Wipe the channel data from your Redux store memory
+                dispatch(setChannel(null));
+                
+                // Step 2: Remove the stale channel item object from your browser cache storage
+                localStorage.removeItem('channel');
+
+                // Step 3: Flip the user profile flag down locally so the navigation header state matches
+                if (userData) {
+                    const updatedUser = { ...userData, hasChannel: false };
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                }
+
+                alert("Channel deleted successfully!");
+                
+                // Step 4: Instantly kick the client back down to home feed dashboard layouts
+                navigate("/");
+            }
+        } catch (err) {
+            console.error("Failed to execute channel deletion:", err);
+            alert(err.response?.data?.message || "An error occurred while deleting the channel.");
         } finally {
             setLoading(false);
         }
@@ -177,7 +212,7 @@ function Channel() {
                         {currentChannel?.description || "This is your personal creative space on Streamo. Share your voice, upload media content, and manage your localized audience base layout engine."}
                     </p>
                     
-                    {/* Management Interactive Row Custom Direct Actions */}
+                    {/* Unified Interactive Action Row Buttons */}
                     {isOwner && (
                         <div className='flex flex-wrap justify-center md:justify-start gap-3 mt-6'>
                             <button className='bg-neutral-900 border border-neutral-800 text-white px-5 py-2.5 rounded-full text-xs font-bold hover:bg-neutral-800 transition-colors shadow-sm cursor-pointer'>
@@ -189,12 +224,19 @@ function Channel() {
                             >
                                 <PlusCircle size={14} /> Upload Video
                             </button>
+                            <button 
+                                onClick={handleDeleteChannel}
+                                disabled={loading}
+                                className='bg-red-600/20 border border-red-500/30 text-red-400 px-5 py-2.5 rounded-full text-xs font-bold hover:bg-red-600 hover:text-white transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-md'
+                            >
+                                {loading ? 'Deleting...' : 'Delete Channel'}
+                            </button>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* 3. EXCLUSIVE TABS PANEL LAYOUT PANEL VIEW (VIDEOS GRID STRIP) */}
+            {/* 3. EXCLUSIVE TABS PANEL LAYOUT VIEW (VIDEOS GRID STRIP) */}
             <div className='px-6 md:px-16 mt-6'>
                 <div className='border-b border-neutral-900 flex gap-8 font-bold text-sm tracking-wide uppercase'>
                     <span className='pb-3 border-b-2 border-white text-white flex items-center gap-1.5 cursor-pointer'>
