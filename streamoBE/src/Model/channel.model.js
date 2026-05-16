@@ -24,6 +24,10 @@ const channelSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    avatar: { 
+        type: String, 
+        default: "" 
+    },
     banner: {
         type: String,
         default: ""

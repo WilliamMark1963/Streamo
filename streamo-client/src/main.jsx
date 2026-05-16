@@ -21,7 +21,7 @@ const router = createBrowserRouter([
       },
       { path: "/signin", element: <SignIn/> },
       { path: "/register", element: <Register />},
-      { path: "/channel", element: <Channel/> },
+      { path: "/channel/:id", element: <Channel/> },
       { path: "/createChannel", element:<CreateChannel/> },
     ]
   }
