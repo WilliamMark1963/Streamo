@@ -11,6 +11,13 @@ const userSlice = createSlice({
       state.userData = action.payload.user;
       state.token = action.payload.token;
     },
+
+    setChannel: (state, action) => {
+      state.channelData = action.payload;
+      if (state.userData) {
+        state.userData.hasChannel = true; // Sync the flag
+      }
+    },
     removeUser: (state) => {
       state.userData = null;
       state.token = null;
@@ -20,5 +27,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { addUser, removeUser } = userSlice.actions;
+export const { addUser, setChannel,removeUser, } = userSlice.actions;
 export default userSlice.reducer;
