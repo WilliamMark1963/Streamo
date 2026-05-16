@@ -2,37 +2,52 @@ import { Channel } from '../Model/channel.model.js';
 import { User } from '../Model/user.model.js';
 export const createChannel = async (req, res) => {
     try {
-        const { name, handle, description } = req.body;
-        const ownerId = req.user._id; // Assuming you have an auth middleware
+        const { channelName, handle, description } = req.body;
+        const ownerId = req.user._id;
 
-        // 1. Check if handle is taken
-        const handleExists = await Channel.findOne({ handle });
-        if (handleExists) return res.status(400).json({ message: "Handle already taken" });
+        if (!channelName || !handle) {
+            return res.status(400).json({ message: "Channel name and unique handle are required" });
+        }
 
-        // 2. Check if user already has a channel
+        const formattedHandle = handle.toLowerCase().trim();
+        const handleExists = await Channel.findOne({ handle: formattedHandle });
+        if (handleExists) {
+            return res.status(400).json({ message: "Handle is already taken. Try another." });
+        }
+
         const user = await User.findById(ownerId);
-        if (user.hasChannel) return res.status(400).json({ message: "User already has a channel" });
+        if (!user) return res.status(404).json({ message: "User account not found" });
+        if (user.hasChannel) return res.status(400).json({ message: "You already own a channel" });
 
-        // 3. Create Channel
+        // Build a localized server asset path url reference string
+        let profilePictureUrl = user.profilePicture; 
+        if (req.file) {
+            // Replaces backslashes with forward slashes for cross-platform system compatibility
+            const normalizedPath = req.file.path.replace(/\\/g, '/');
+            // This yields strings like: "http://localhost:5000/public/temp/avatar-1715..."
+            profilePictureUrl = `${req.protocol}://${req.get('host')}/${normalizedPath}`;
+        }
+
         const newChannel = await Channel.create({
-            name,
-            handle,
-            description,
-            owner: ownerId
+            name: channelName.trim(),
+            handle: formattedHandle,
+            description: description ? description.trim() : "",
+            owner: ownerId,
+             avatar: profilePictureUrl,
+            banner: "" 
         });
 
-        // 4. Update User status
         user.hasChannel = true;
         await user.save();
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
-            message: "Channel created successfully",
+            message: "Channel created successfully local-side",
             channel: newChannel
         });
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 };
 
