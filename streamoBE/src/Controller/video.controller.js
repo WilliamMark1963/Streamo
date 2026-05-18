@@ -1,5 +1,5 @@
-import { Video } from '../Models/video.model.js';
-import { Channel } from '../Models/channel.model.js';
+import {Video} from "../Model/video.model.js"
+import { Channel } from "../Model/channel.model.js";
 
 export const uploadVideoAsset = async (req, res) => {
     try {

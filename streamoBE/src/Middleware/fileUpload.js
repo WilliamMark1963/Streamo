@@ -6,9 +6,9 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // If it's a video file, we can optionally route it to a different directory or keep it in temp
     if (file.fieldname === 'videoFile') {
-      cb(null, './uploads/videos'); // Matches your static app.use('/uploads/videos') directory setup
+      cb(null, './uploads/videos'); // Matches static app.use('/uploads/videos') directory setup
     } else if (file.fieldname === 'thumbnailFile') {
-      cb(null, './uploads/thumbnails'); // Matches your static app.use('/uploads/thumbnails') directory setup
+      cb(null, './uploads/thumbnails'); // Matches static app.use('/uploads/thumbnails') directory setup
     } else {
       cb(null, './public/temp'); // Fallback for avatars / banners
     }

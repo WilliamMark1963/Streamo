@@ -1,5 +1,5 @@
 import express from 'express';
-import { uploadVideoAsset, getChannelVideos } from '../Controllers/video.controller.js';
+import { uploadVideoAsset, getChannelVideos } from '../Controller/video.controller.js';
 import { verifyToken } from '../Middleware/verifyToken.js';
 import { uploadVideo } from '../Middleware/fileUpload.js'; // Using your existing multer instance setup
 
