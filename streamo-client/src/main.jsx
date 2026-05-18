@@ -10,6 +10,7 @@ import SignIn from './Components/SignIn.jsx'
 import Channel from './Components/Channel.jsx'
 import Register from './Components/Register.jsx'
 import CreateChannel from './Components/createChannel.jsx'
+import UploadVideoForm from './Components/UploadVideoForm.jsx'
 const router = createBrowserRouter([
   {
     path: "/",
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       { path: "/register", element: <Register />},
       { path: "/channel/:id", element: <Channel/> },
       { path: "/createChannel", element:<CreateChannel/> },
+      {
+        path:"/upload-video",
+        element: <UploadVideoForm/>
+      }
     ]
   }
 ])

@@ -1,10 +1,11 @@
-import React, { use, useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Camera, Edit2, Video, PlusCircle, Loader2 } from 'lucide-react';
 import { setChannel, removeChannelState } from "../utils/userSlice"
 import API from'../utils/APIintercept'
-import ChannelVideos from '../components/ChannelVideos';
+import ChannelVideos from "./ChannelVideos"
 import { useNavigate } from 'react-router-dom';
+
 function Channel() {
     const dispatch = useDispatch();
     const { channelData } = useSelector((state) => state.user);
@@ -186,7 +187,7 @@ function  handleChannelworkspace(){
                         <button className='bg-neutral-900 border border-neutral-800 text-white px-5 py-2.5 rounded-full text-xs font-bold hover:bg-neutral-800 transition-colors shadow-sm cursor-pointer'>
                             Manage Channel Settings
                         </button>
-                        <button className='bg-blue-600 text-white px-5 py-2.5 rounded-full text-xs font-bold hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-1.5 shadow-md cursor-pointer'>
+                        <button className='bg-blue-600 text-white px-5 py-2.5 rounded-full text-xs font-bold hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-1.5 shadow-md cursor-pointer' onClick={()=>navigate("/upload-video")}>
                             <PlusCircle size={14} /> Upload Video
                         </button>
                         <button 
