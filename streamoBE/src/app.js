@@ -2,7 +2,7 @@ import express from 'express';
 import userRoutes from './Routes/user.routes.js'
 import cors from 'cors';
 import channelRouter from './Routes/channel.routes.js'
-
+import videoRouter from "./Routes/video.router.js"
 
 const app = new express()
 
