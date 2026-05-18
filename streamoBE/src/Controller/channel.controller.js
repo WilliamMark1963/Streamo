@@ -59,7 +59,10 @@ export const getMyChannel = async (req, res) => {
         const channel = await Channel.findOne({ owner: req.user._id });
         if (!channel) return res.status(404).json({ message: "Channel not found" });
         
-        res.status(200).json(channel);
+        res.status(200).json({
+            success: true,
+            channel
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -69,8 +72,11 @@ export const getMyChannel = async (req, res) => {
 const deleteOldFile = (fileUrl) => {
     try {
         if (!fileUrl) return;
-        // Turn "http://localhost:5000/public/temp/filename.jpg" into a local path like "public/temp/filename.jpg"
-        const relativePath = fileUrl.split(`${process.env.PROTOCOL || 'http'}://${process.env.HOST || 'localhost:5000'}/`)[1];
+
+        // Safer approach: Parse the URL path directly to extract the storage directory layout
+        const urlObj = new URL(fileUrl);
+        // urlObj.pathname returns "/public/temp/filename.jpg", slice(1) makes it "public/temp/filename.jpg"
+        const relativePath = urlObj.pathname.slice(1); 
         
         if (relativePath && fs.existsSync(relativePath)) {
             fs.unlinkSync(relativePath);
