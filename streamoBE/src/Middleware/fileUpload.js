@@ -59,5 +59,5 @@ const videoFormFilter = (req, file, cb) => {
 export const uploadVideo = multer({
     storage: storage,
     fileFilter: videoFormFilter,
-    limits: { fileSize: 100 * 1024 * 1024 } // Expanded 100MB capacity ceiling to safely capture high-fidelity video streams
+    limits: { fileSize: 500 * 1024 * 1024 } // Expanded 100MB capacity ceiling to safely capture high-fidelity video streams
 });

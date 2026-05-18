@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Film, Image, UploadCloud, Loader2, ArrowLeft } from 'lucide-react';
+import { useSelector } from 'react-redux';
 import API from "../utils/APIintercept"
 
 function UploadVideoForm() {
     const navigate = useNavigate();
+    const { channelData } = useSelector((state) => state.user);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [videoFile, setVideoFile] = useState(null);
@@ -34,7 +36,11 @@ function UploadVideoForm() {
 
             alert("Video successfully processed and updated to your stream feed!");
             // Automatically push back to the main channel dashboard page view layout
-            navigate('/channel'); 
+            if (channelData?._id) {
+                navigate(`/channel/${channelData._id}`);
+            } else {
+                navigate('/'); // Clean fallback route back into Home if variables are cleared out
+            }
         } catch (error) {
             alert(error.response?.data?.message || "Failed to finalize asset tracking registry variables.");
         } finally {

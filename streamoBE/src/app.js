@@ -17,14 +17,16 @@ app.use(cors({
 app.use(express.json())
 app.use('/public', express.static('public'))
 
+// Expose internal asset stores globally via relative web path strings
+app.use('/uploads/videos', express.static('uploads/videos'));
+app.use('/uploads/thumbnails', express.static('uploads/thumbnails'));
+// Video upload Routes
+app.use("/video", videoRouter);
 
 // Authentication Routes
 app.use("/", userRoutes)
 //Channel Routes
 app.use("/", channelRouter)
 
-// Expose internal asset stores globally via relative web path strings
-app.use('/uploads/videos', express.static('uploads/videos'));
-app.use('/uploads/thumbnails', express.static('uploads/thumbnails'));
-// Video upload Routes
+
 export default app;
