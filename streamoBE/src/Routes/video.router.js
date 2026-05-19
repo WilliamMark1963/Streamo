@@ -16,4 +16,11 @@ router.post('/upload', verifyToken, uploadVideo.fields([
 // Open route to fetch specific video lists for layout injection
 router.get('/channel/:channelId', getChannelVideos);
 
+// Route: PUT /video/:videoId
+// Expects: req.body = { title, description }
+router.put('/:videoId', verifyToken, updateVideoAsset);
+
+// Route: DELETE /video/:videoId
+router.delete('/:videoId', verifyToken, deleteVideoAsset);
+
 export default router;

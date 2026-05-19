@@ -67,3 +67,72 @@ export const getChannelVideos = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
+// 3. UPDATE VIDEO TEXT METADATA (CRUD - Update)
+export const updateVideoAsset = async (req, res) => {
+    try {
+        const { videoId } = req.params;
+        const { title, description } = req.body;
+        const ownerId = req.user._id;
+
+        if (!title) {
+            return res.status(400).json({ message: "Video title is required." });
+        }
+
+        // Locate the video and verify the authenticated request owner matches
+        const video = await Video.findById(videoId);
+        if (!video) {
+            return res.status(404).json({ message: "Video asset not found." });
+        }
+
+        if (video.owner.toString() !== ownerId.toString()) {
+            return res.status(403).json({ message: "Unauthorized. You can only manage your own media content assets." });
+        }
+
+        // Commit text update parameters
+        video.title = title.trim();
+        video.description = description ? description.trim() : "";
+        await video.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Video metadata updated successfully!",
+            video
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+// 4. DELETE VIDEO ASSET PROFILE (CRUD - Delete)
+export const deleteVideoAsset = async (req, res) => {
+    try {
+        const { videoId } = req.params;
+        const ownerId = req.user._id;
+
+        // Locate video entry
+        const video = await Video.findById(videoId);
+        if (!video) {
+            return res.status(404).json({ message: "Video file target not found." });
+        }
+
+        // Verify resource ownership access
+        if (video.owner.toString() !== ownerId.toString()) {
+            return res.status(403).json({ message: "Unauthorized. Action restricted to asset content owners." });
+        }
+
+        // Purge record from MongoDB
+        await Video.findByIdAndDelete(videoId);
+
+        /* 💡 Note: If you want to clean up local storage files on your drive, 
+           you can eventually import 'fs' and delete video.videoUrl paths here.
+        */
+
+        return res.status(200).json({
+            success: true,
+            message: "Video record permanently purged from database registries."
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
