@@ -48,24 +48,7 @@ export const getVideoComments = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
-// 2. FETCH ALL COMMENTS FOR A VIDEO (GET /comment/:videoId)
-export const getVideoComments = async (req, res) => {
-    try {
-        const { videoId } = req.params;
 
-        // Fetch comments for the video, join user metadata, sort by newest first
-        const comments = await Comment.find({ video: videoId })
-            .populate('user', 'name avatar')
-            .sort({ createdAt: -1 });
-
-        return res.status(200).json({
-            success: true,
-            comments
-        });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-};
 // 3. UPDATE A COMMENT (PUT /comment/:commentId)
 export const updateComment = async (req, res) => {
     try {
