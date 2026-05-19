@@ -1,14 +1,28 @@
 import React, { useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { ThumbsUp, ThumbsDown, Share2, Send, ArrowLeft } from 'lucide-react';
+import { useSelector } from "react-redux"
 
 function VideoPlayerPage() {
     const { videoId } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
 
+
     // Safely pull state passed through the Link component wrapper fallback
     const { videoData } = location.state || {};
+
+    // Subscribe logic
+    const { user } = useSelector((state) => state.user);
+    const [isSubscribed, setIsSubscribed] = useState(false);
+    const isOwnChannel = user?._id === videoData?.owner;
+    const handleSubscribeClick = () => {
+        if (isOwnChannel) {
+            alert("You cannot subscribe to your own channel!");
+            return;
+        }
+        setIsSubscribed(!isSubscribed);
+    };
 
     // Static placeholder comments state model
     const [comments, setComments] = useState([
@@ -50,10 +64,10 @@ function VideoPlayerPage() {
 
     return (
         <div className="w-full min-h-screen bg-[#0f0f0f] text-white px-4 md:px-12 py-6">
-            
+
             {/* Top Navigation Back button */}
-            <button 
-                onClick={() => navigate(-1)} 
+            <button
+                onClick={() => navigate(-1)}
                 className="flex items-center gap-2 text-xs font-semibold text-neutral-400 hover:text-white mb-6 transition-colors cursor-pointer"
             >
                 <ArrowLeft size={14} /> Back
@@ -61,14 +75,14 @@ function VideoPlayerPage() {
 
             {/* Layout Grid Split Splitter */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                
+
                 {/* LEFT SIDE COLUMN: VIDEO CONTROLLER FRAME AND DETAILS */}
                 <div className="lg:col-span-2 space-y-4">
                     {/* Native Video Element Wrapper Container */}
                     <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-neutral-900">
-                        <video 
-                            src={fullVideoUrl} 
-                            controls 
+                        <video
+                            src={fullVideoUrl}
+                            controls
                             autoPlay
                             className="w-full h-full object-contain"
                             poster={`${backendBase}${videoData.thumbnailUrl}`}
@@ -80,13 +94,54 @@ function VideoPlayerPage() {
                         <h1 className="text-xl md:text-2xl font-black tracking-tight leading-snug">
                             {videoData.title}
                         </h1>
-                        
+
                         {/* Engagement Bar Metric Elements */}
                         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-neutral-900 pb-4">
-                            <p className="text-neutral-400 text-xs font-medium">
-                                {videoData.viewsCount || 0} views • {new Date(videoData.createdAt || Date.now()).toLocaleDateString()}
-                            </p>
-                            
+
+                            {/* LEFT SIDE: Channel Info Banner + Static Subscribe Action Controls */}
+                            <div className="flex items-center gap-3">
+                                {/* Channel Profile Avatar Circle Frame */}
+                                <div className="w-10 h-10 bg-neutral-800 border border-neutral-900 rounded-full overflow-hidden flex items-center justify-center text-xs font-black uppercase text-neutral-300 shrink-0">
+                                    {videoData.channel?.avatar ? (
+                                        <img
+                                            src={videoData.channel.avatar.startsWith('http') ? videoData.channel.avatar : `http://localhost:5000${videoData.channel.avatar}`}
+                                            alt=""
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        videoData.channel?.name?.charAt(0) || 'S'
+                                    )}
+                                </div>
+
+                                {/* Channel Handle Details Text */}
+                                <div className="mr-2">
+                                    <h4 className="text-sm font-black text-neutral-100 leading-tight">
+                                        {videoData.channel?.name || "Unknown Channel"}
+                                    </h4>
+                                    <p className="text-[11px] text-neutral-500 font-medium">
+                                        {videoData.viewsCount || 0} views
+                                    </p>
+                                </div>
+
+                                {/* 🌟 THE NEW STATIC SUBSCRIBE BUTTON INSERTION POINT */}
+                                {isOwnChannel ? (
+                                    <span className="text-[10px] uppercase font-black tracking-widest text-neutral-500 bg-neutral-900/50 border border-neutral-900 px-3 py-2 rounded-xl select-none">
+                                        Your Channel
+                                    </span>
+                                ) : (
+                                    <button
+                                        onClick={handleSubscribeClick}
+                                        className={`flex items-center gap-1.5 text-xs font-black px-5 py-2 rounded-full transition-all tracking-wide active:scale-[0.98] cursor-pointer shadow-sm ${isSubscribed
+                                                ? 'bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700'
+                                                : 'bg-white text-black hover:bg-neutral-200'
+                                            }`}
+                                    >
+                                        {isSubscribed ? "Subscribed" : "Subscribe"}
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* RIGHT SIDE: Video Reaction Mechanics (Likes/Dislikes/Share) */}
                             <div className="flex items-center gap-2">
                                 <div className="bg-neutral-900 border border-neutral-800 rounded-full flex items-center p-1">
                                     <button className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold hover:bg-neutral-800 rounded-l-full cursor-pointer transition-colors border-r border-neutral-800">
@@ -100,6 +155,7 @@ function VideoPlayerPage() {
                                     <Share2 size={14} /> Share
                                 </button>
                             </div>
+
                         </div>
                     </div>
 
@@ -120,15 +176,15 @@ function VideoPlayerPage() {
 
                     {/* New Comment Submission Form Block */}
                     <form onSubmit={handleAddComment} className="flex gap-2 mb-6">
-                        <input 
+                        <input
                             type="text"
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
                             placeholder="Add a public comment..."
                             className="flex-1 bg-[#0f0f0f] border border-neutral-800 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-blue-500 transition-colors"
                         />
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             className="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl transition-transform active:scale-95 flex items-center justify-center cursor-pointer shadow-md"
                         >
                             <Send size={14} />
