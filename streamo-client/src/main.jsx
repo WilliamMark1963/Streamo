@@ -12,6 +12,7 @@ import Register from './Components/Register.jsx'
 import CreateChannel from './Components/createChannel.jsx'
 import UploadVideoForm from './Components/UploadVideoForm.jsx'
 import VideoPlayerPage from './Components/VideoPlayerPage.jsx'
+import ManageVideos from './Components/ManageVideos.jsx'
 const router = createBrowserRouter([
   {
     path: "/",
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       { path: "/signin", element: <SignIn/> },
       { path: "/register", element: <Register />},
       { path: "/channel/:id", element: <Channel/> },
+      {
+        path:"manage-videos",
+        element: <ManageVideos/>
+      },
       { path: "/createChannel", element:<CreateChannel/> },
       {
         path:"/upload-video",

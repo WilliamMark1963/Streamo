@@ -2,6 +2,7 @@ import { Channel } from '../Model/channel.model.js';
 import { User } from '../Model/user.model.js';
 import fs from'fs';
 import path from 'path';
+import { Video } from "../Model/video.model.js";
 export const createChannel = async (req, res) => {
     try {
         const { channelName, handle, description } = req.body;
@@ -185,7 +186,7 @@ export const deleteChannel = async (req, res) => {
         // 1. Delete associated local storage files if they exist
         deleteOldFile(channel.avatar);
         deleteOldFile(channel.banner);
-
+        await Video.deleteMany({ channel: channelId });
         // 2. Remove the Channel document from the database
         await Channel.findByIdAndDelete(channelId);
 

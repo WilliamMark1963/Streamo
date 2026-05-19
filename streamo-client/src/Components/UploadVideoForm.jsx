@@ -12,7 +12,6 @@ function UploadVideoForm() {
     const [videoFile, setVideoFile] = useState(null);
     const [thumbnailFile, setThumbnailFile] = useState(null);
     const [isPublishing, setIsPublishing] = useState(false);
-
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         if (!videoFile || !thumbnailFile || !title) {
@@ -53,7 +52,7 @@ function UploadVideoForm() {
             <div className="w-full max-w-2xl bg-[#161616] border border-neutral-900 rounded-2xl p-6 md:p-8 shadow-2xl relative">
                 
                 <button 
-                    onClick={() => navigate('/channel')} 
+                    onClick={() => navigate(`/channel/${channelData._id}`)} 
                     className="flex items-center gap-2 text-xs font-semibold text-neutral-400 hover:text-white mb-6 transition-colors cursor-pointer"
                 >
                     <ArrowLeft size={14} /> Back to Channel
