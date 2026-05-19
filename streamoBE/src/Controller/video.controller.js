@@ -1,22 +1,24 @@
 import {Video} from "../Model/video.model.js"
 import { Channel } from "../Model/channel.model.js";
 
+// 1. CREATE OPERATIOn
 export const uploadVideoAsset = async (req, res) => {
     try {
-        const { title, description } = req.body;
+        // Pull category destructured straight from req.body payload
+        const { title, description, category } = req.body;
         const ownerId = req.user._id;
 
         if (!title) {
             return res.status(400).json({ message: "Video title is required." });
         }
 
-        // 1. Locate the channel owned by the active user credentials
+        // Locate the channel owned by the active user credentials
         const channel = await Channel.findOne({ owner: ownerId });
         if (!channel) {
             return res.status(404).json({ message: "You must create a channel before uploading videos." });
         }
 
-        // 2. File verification checks (Using multer's field configurations)
+        // File verification checks (Using multer's field configurations)
         if (!req.files || !req.files.videoFile || !req.files.thumbnailFile) {
             return res.status(400).json({ message: "Both a video file and a thumbnail image are required." });
         }
@@ -24,18 +26,19 @@ export const uploadVideoAsset = async (req, res) => {
         const videoFile = req.files.videoFile[0];
         const thumbnailFile = req.files.thumbnailFile[0];
 
-        // 3. Normalize paths for storage matching cross-platform systems
+        // Normalize paths for storage matching cross-platform systems
         const normalizedVideoPath = videoFile.path.replace(/\\/g, '/');
         const normalizedThumbnailPath = thumbnailFile.path.replace(/\\/g, '/');
 
-        // 4. Construct asset URLs
+        // Construct asset URLs
         const videoUrl = `${req.protocol}://${req.get('host')}/${normalizedVideoPath}`;
         const thumbnailUrl = `${req.protocol}://${req.get('host')}/${normalizedThumbnailPath}`;
 
-        // 5. Commit record back down to MongoDB
+        // Commit record back down to MongoDB including category
         const newVideo = await Video.create({
             title: title.trim(),
             description: description ? description.trim() : "",
+            category: category || "All", // Injects selected tag or falls back safely to 'All'
             videoUrl,
             thumbnailUrl,
             channel: channel._id,
@@ -72,7 +75,8 @@ export const getChannelVideos = async (req, res) => {
 export const updateVideoAsset = async (req, res) => {
     try {
         const { videoId } = req.params;
-        const { title, description } = req.body;
+        // Accept category updates from editing form inputs
+        const { title, description, category } = req.body;
         const ownerId = req.user._id;
 
         if (!title) {
@@ -89,9 +93,11 @@ export const updateVideoAsset = async (req, res) => {
             return res.status(403).json({ message: "Unauthorized. You can only manage your own media content assets." });
         }
 
-        // Commit text update parameters
+        // Commit text and structural category updates back to the instance document
         video.title = title.trim();
         video.description = description ? description.trim() : "";
+        video.category = category || video.category; // 👈 Updates the category value or preserves existing state
+        
         await video.save();
 
         return res.status(200).json({

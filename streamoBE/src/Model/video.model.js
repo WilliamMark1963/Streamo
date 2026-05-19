@@ -18,6 +18,12 @@ const videoSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Thumbnail image URL reference string is required']
     },
+    category: { 
+        type: String, 
+        required: true, 
+        default: "All",
+        enum: ["All", "Tech", "Music", "Gaming", "Cooking", "Web Development", "Podcasts"] // Restricts options to valid tags
+    },
     duration: {
         type: Number, // Stored in seconds
         default: 0
