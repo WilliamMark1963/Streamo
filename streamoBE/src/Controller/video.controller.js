@@ -136,3 +136,20 @@ export const deleteVideoAsset = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
+// FETCH ALL VIDEOS FOR PUBLIC HOME FEED (No token required)
+export const getAllVideosPublic = async (req, res) => {
+    try {
+        // Find all videos, populate channel details, sort by newest
+        const videos = await Video.find()
+            .populate('channel', 'name avatar handle') 
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            videos
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};

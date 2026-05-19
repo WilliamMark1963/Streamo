@@ -3,7 +3,8 @@ import {
     uploadVideoAsset, 
     getChannelVideos,
     updateVideoAsset,
-    deleteVideoAsset
+    deleteVideoAsset,
+    getAllVideosPublic
 
 } from '../Controller/video.controller.js';
 import { verifyToken } from '../Middleware/verifyToken.js';
@@ -28,5 +29,7 @@ router.put('/:videoId', verifyToken, updateVideoAsset);
 
 // Route: DELETE /video/:videoId
 router.delete('/:videoId', verifyToken, deleteVideoAsset);
+
+router.get('/all-videos', getAllVideosPublic);
 
 export default router;
