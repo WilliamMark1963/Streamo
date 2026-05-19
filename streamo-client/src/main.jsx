@@ -11,6 +11,7 @@ import Channel from './Components/Channel.jsx'
 import Register from './Components/Register.jsx'
 import CreateChannel from './Components/createChannel.jsx'
 import UploadVideoForm from './Components/UploadVideoForm.jsx'
+import VideoPlayerPage from './Components/VideoPlayerPage.jsx'
 const router = createBrowserRouter([
   {
     path: "/",
@@ -27,6 +28,9 @@ const router = createBrowserRouter([
       {
         path:"/upload-video",
         element: <UploadVideoForm/>
+      },
+      {
+        path:"/watch/:videoId", element: <VideoPlayerPage/>
       }
     ]
   }

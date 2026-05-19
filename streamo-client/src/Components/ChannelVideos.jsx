@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Play, Film } from 'lucide-react';
-import API from'../utils/APIintercept'
+import { Link } from 'react-router-dom'; // 1. Added the Router Link import
+import API from '../utils/APIintercept';
 
 function ChannelVideos({ channelId }) {
     const [videos, setVideos] = useState([]);
@@ -10,7 +11,6 @@ function ChannelVideos({ channelId }) {
         const fetchFeed = async () => {
             if (!channelId) return;
             try {
-                // Hits router.get('/video/channel/:channelId')
                 const response = await API.get(`/video/channel/${channelId}`);
                 setVideos(response.data.videos || []);
             } catch (error) {
@@ -39,12 +39,18 @@ function ChannelVideos({ channelId }) {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-6 animate-fadeIn">
             {videos.map((video) => (
-                <div key={video._id} className="group flex flex-col bg-[#161616] border border-neutral-900 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-0.5">
+                /* 2. Replaced the top-level div with <Link> and injected state router variables */
+                <Link 
+                    key={video._id} 
+                    to={`/watch/${video._id}`} 
+                    state={{ videoData: video }} // 👈 Ships metadata object payload to VideoPlayerPage
+                    className="group flex flex-col bg-[#161616] border border-neutral-900 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-0.5 cursor-pointer"
+                >
                     
                     {/* Thumbnail Image Framework Display container */}
-                    <div className="aspect-video w-full bg-neutral-800 relative overflow-hidden group">
+                    <div className="aspect-video w-full bg-neutral-800 relative overflow-hidden">
                         <img 
-                            src={video.thumbnailUrl} 
+                            src={video.thumbnailUrl?.startsWith('http') ? video.thumbnailUrl : `http://localhost:5000${video.thumbnailUrl}`} 
                             alt={video.title} 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -60,15 +66,14 @@ function ChannelVideos({ channelId }) {
                         <h4 className="text-sm font-bold text-neutral-100 line-clamp-1 group-hover:text-blue-400 transition-colors mb-1">
                             {video.title}
                         </h4>
-                        <p className="text-neutral-500 text-xs line-clamp-2 leading-relaxed flex-1">
+                        <p className="text-neutral-400 text-xs line-clamp-2 leading-relaxed flex-1">
                             {video.description || "No asset descriptions added to this upload record instance."}
                         </p>
-                        <div className="text-[10px] text-neutral-600 font-bold uppercase tracking-wider mt-3 pt-2 border-t border-neutral-900">
-                            {video.views} views • {new Date(video.createdAt).toLocaleDateString()}
+                        <div className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider mt-3 pt-2 border-t border-neutral-900">
+                            {video.viewsCount || 0} views • {new Date(video.createdAt).toLocaleDateString()}
                         </div>
                     </div>
-
-                </div>
+                </Link>
             ))}
         </div>
     );
