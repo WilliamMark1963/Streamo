@@ -9,6 +9,7 @@ function UploadVideoForm() {
     const { channelData } = useSelector((state) => state.user);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [category, setCategory] = useState('All');
     const [videoFile, setVideoFile] = useState(null);
     const [thumbnailFile, setThumbnailFile] = useState(null);
     const [isPublishing, setIsPublishing] = useState(false);
@@ -22,12 +23,13 @@ function UploadVideoForm() {
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', description);
+        formData.append('category', category);
         formData.append('videoFile', videoFile);        // Matches backend .fields() key name
         formData.append('thumbnailFile', thumbnailFile);  // Matches backend .fields() key name
 
         try {
             setIsPublishing(true);
-            
+
             // Your app.js matches layout: app.use("/video", videoRouter)
             await API.post('/video/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
@@ -50,9 +52,9 @@ function UploadVideoForm() {
     return (
         <div className="w-full min-h-screen bg-[#0f0f0f] text-white p-6 md:p-12 flex justify-center items-center">
             <div className="w-full max-w-2xl bg-[#161616] border border-neutral-900 rounded-2xl p-6 md:p-8 shadow-2xl relative">
-                
-                <button 
-                    onClick={() => navigate(`/channel/${channelData._id}`)} 
+
+                <button
+                    onClick={() => navigate(`/channel/${channelData._id}`)}
                     className="flex items-center gap-2 text-xs font-semibold text-neutral-400 hover:text-white mb-6 transition-colors cursor-pointer"
                 >
                     <ArrowLeft size={14} /> Back to Channel
@@ -67,8 +69,8 @@ function UploadVideoForm() {
                     {/* Title Input */}
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Video Title *</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="Catchy title for your content..."
@@ -80,13 +82,31 @@ function UploadVideoForm() {
                     {/* Description Input */}
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Description</label>
-                        <textarea 
+                        <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Tell your viewers about your video..."
                             rows={4}
                             className="w-full bg-[#0f0f0f] border border-neutral-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-colors resize-none"
                         />
+                    </div>
+
+                    {/* Category Dropdown Selector Tag */}
+                    <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Video Category Tag *</label>
+                        <select
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            className="w-full bg-[#0f0f0f] border border-neutral-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 text-neutral-300 transition-colors cursor-pointer"
+                        >
+                            <option value="All">All / General</option>
+                            <option value="Tech">Tech</option>
+                            <option value="Music">Music</option>
+                            <option value="Gaming">Gaming</option>
+                            <option value="Cooking">Cooking</option>
+                            <option value="Web Development">Web Development</option>
+                            <option value="Podcasts">Podcasts</option>
+                        </select>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -96,8 +116,8 @@ function UploadVideoForm() {
                             <span className="text-xs font-medium text-neutral-400 max-w-[180px] truncate">
                                 {videoFile ? videoFile.name : "Select Video File"}
                             </span>
-                            <input 
-                                type="file" 
+                            <input
+                                type="file"
                                 accept="video/*"
                                 onChange={(e) => setVideoFile(e.target.files[0])}
                                 className="absolute inset-0 opacity-0 cursor-pointer"
@@ -111,8 +131,8 @@ function UploadVideoForm() {
                             <span className="text-xs font-medium text-neutral-400 max-w-[180px] truncate">
                                 {thumbnailFile ? thumbnailFile.name : "Select Thumbnail Image"}
                             </span>
-                            <input 
-                                type="file" 
+                            <input
+                                type="file"
                                 accept="image/*"
                                 onChange={(e) => setThumbnailFile(e.target.files[0])}
                                 className="absolute inset-0 opacity-0 cursor-pointer"
@@ -122,8 +142,8 @@ function UploadVideoForm() {
                     </div>
 
                     {/* Actions and Submission controls */}
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         disabled={isPublishing}
                         className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-neutral-800 disabled:text-neutral-500 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all active:scale-[0.99] flex items-center justify-center gap-2 shadow-lg cursor-pointer mt-4"
                     >

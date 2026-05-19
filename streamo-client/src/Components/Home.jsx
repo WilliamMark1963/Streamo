@@ -31,19 +31,16 @@ function Home() {
     }, []);
 
     // Filter processing simulation handler
-    const handleFilterClick = (category) => {
-        setActiveFilter(category);
-        if (category === "All") {
-            setFilteredVideos(videos);
-        } else {
-            // Client-side simulation matching text items against titles/descriptions
-            const filtered = videos.filter(video => 
-                video.title.toLowerCase().includes(category.toLowerCase()) || 
-                video.description?.toLowerCase().includes(category.toLowerCase())
-            );
-            setFilteredVideos(filtered);
-        }
-    };
+const handleFilterClick = (category) => {
+    setActiveFilter(category);
+    if (category === "All") {
+        setFilteredVideos(videos); // Show everything
+    } else {
+        //  Accurate property lookup instead of fuzzy string guessing!
+        const filtered = videos.filter(video => video.category === category);
+        setFilteredVideos(filtered);
+    }
+};
 
     if (loading) {
         return (

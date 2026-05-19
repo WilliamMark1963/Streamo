@@ -7,7 +7,7 @@ import API from '../utils/APIintercept';
 function ManageVideos() {
     const navigate = useNavigate();
     const { channelData } = useSelector((state) => state.user);
-    
+
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
@@ -15,6 +15,7 @@ function ManageVideos() {
     // Edit Modal States
     const [editingVideo, setEditingVideo] = useState(null);
     const [editTitle, setEditTitle] = useState('');
+    const [editCategory, setEditCategory] = useState('');
     const [editDescription, setEditDescription] = useState('');
 
     // Fetch Channel Specific Catalog
@@ -37,12 +38,12 @@ function ManageVideos() {
     // Handle Delete Operation (CRUD - Delete)
     const handleDelete = async (videoId) => {
         if (!window.confirm("Are you sure you want to delete this video file entry permanently from your stream ecosystem registry?")) return;
-        
+
         try {
             setActionLoading(true);
             // Hits backend setup layout routing target: router.delete('/video/:id')
             await API.delete(`/video/${videoId}`);
-            
+
             // Sync client state seamlessly without running another heavy network fetch
             setVideos(videos.filter(v => v._id !== videoId));
             alert("Video asset successfully purged from data servers.");
@@ -53,10 +54,13 @@ function ManageVideos() {
         }
     };
 
+
     // Open Edit Modal Form Framework
     const openEditModal = (video) => {
+        console.log(video);
         setEditingVideo(video);
         setEditTitle(video.title);
+        setEditCategory(video.category)
         setEditDescription(video.description || '');
     };
 
@@ -70,7 +74,8 @@ function ManageVideos() {
             // Hits backend text patch endpoint layout: router.put('/video/:id')
             const response = await API.put(`/video/${editingVideo._id}`, {
                 title: editTitle,
-                description: editDescription
+                description: editDescription,
+                category: editCategory
             });
 
             // Re-map localized states instantly
@@ -96,10 +101,10 @@ function ManageVideos() {
     return (
         <div className="w-full min-h-screen bg-[#0f0f0f] text-white p-6 md:p-12">
             <div className="max-w-5xl mx-auto">
-                
+
                 {/* Header Back Strip */}
-                <button 
-                    onClick={() => navigate(-1)} 
+                <button
+                    onClick={() => navigate(-1)}
                     className="flex items-center gap-2 text-xs font-semibold text-neutral-400 hover:text-white mb-6 transition-colors cursor-pointer"
                 >
                     <ArrowLeft size={14} /> Back to Dashboard
@@ -110,7 +115,7 @@ function ManageVideos() {
                         <h2 className="text-2xl font-black tracking-tight">Channel Content Studio</h2>
                         <p className="text-xs text-neutral-400 mt-1">Perform configuration modifications, manage textual metadata schemas, or delete stream media profiles.</p>
                     </div>
-                    <button 
+                    <button
                         onClick={() => navigate('/upload-video')}
                         className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-3 rounded-xl uppercase tracking-wider transition-all active:scale-[0.98] self-start md:self-auto shadow-md"
                     >
@@ -141,9 +146,9 @@ function ManageVideos() {
                                     {/* Info Panel Left Block */}
                                     <div className="col-span-8 md:col-span-6 flex items-center gap-3 pr-2">
                                         <div className="w-20 aspect-video bg-neutral-900 rounded-lg overflow-hidden shrink-0 hidden sm:block border border-neutral-800">
-                                            <img 
-                                                src={video.thumbnailUrl?.startsWith('http') ? video.thumbnailUrl : `http://localhost:5000${video.thumbnailUrl}`} 
-                                                alt="" 
+                                            <img
+                                                src={video.thumbnailUrl?.startsWith('http') ? video.thumbnailUrl : `http://localhost:5000${video.thumbnailUrl}`}
+                                                alt=""
                                                 className="w-full h-full object-cover"
                                             />
                                         </div>
@@ -163,7 +168,7 @@ function ManageVideos() {
 
                                     {/* Control Hotspots Right Columns */}
                                     <div className="col-span-4 md:col-span-2 flex items-center justify-end gap-2.5">
-                                        <button 
+                                        <button
                                             onClick={() => openEditModal(video)}
                                             disabled={actionLoading}
                                             className="p-2 text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer disabled:opacity-30"
@@ -171,7 +176,7 @@ function ManageVideos() {
                                         >
                                             <Edit3 size={16} />
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={() => handleDelete(video._id)}
                                             disabled={actionLoading}
                                             className="p-2 text-neutral-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer disabled:opacity-30"
@@ -190,9 +195,9 @@ function ManageVideos() {
                 {editingVideo && (
                     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                         <div className="w-full max-w-lg bg-[#161616] border border-neutral-800 rounded-2xl p-6 shadow-2xl relative animate-fadeIn">
-                            
-                            <button 
-                                onClick={() => setEditingVideo(null)} 
+
+                            <button
+                                onClick={() => setEditingVideo(null)}
                                 className="absolute top-4 right-4 text-neutral-500 hover:text-white transition-colors cursor-pointer"
                             >
                                 <X size={18} />
@@ -206,8 +211,8 @@ function ManageVideos() {
                             <form onSubmit={handleUpdateSubmit} className="space-y-4">
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">Video Title *</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={editTitle}
                                         onChange={(e) => setEditTitle(e.target.value)}
                                         className="w-full bg-[#0f0f0f] border border-neutral-800 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-blue-500 transition-colors"
@@ -217,7 +222,7 @@ function ManageVideos() {
 
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">Description Context Area</label>
-                                    <textarea 
+                                    <textarea
                                         value={editDescription}
                                         onChange={(e) => setEditDescription(e.target.value)}
                                         rows={4}
@@ -225,15 +230,33 @@ function ManageVideos() {
                                     />
                                 </div>
 
+                                {/* In your ManageVideos.jsx Edit Modal Form: */}
+                                <div>
+                                    <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">Change Category</label>
+                                    <select
+                                        value={editCategory} // Ensure you add an 'editCategory' state hook to ManageVideos.jsx
+                                        onChange={(e) => setEditCategory(e.target.value)}
+                                        className="w-full bg-[#0f0f0f] border border-neutral-800 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-blue-500 text-neutral-300 cursor-pointer"
+                                    >
+                                        <option value="All">All</option>
+                                        <option value="Tech">Tech</option>
+                                        <option value="Music">Music</option>
+                                        <option value="Gaming">Gaming</option>
+                                        <option value="Cooking">Cooking</option>
+                                        <option value="Web Development">Web Development</option>
+                                        <option value="Podcasts">Podcasts</option>
+                                    </select>
+                                </div>
+
                                 <div className="flex items-center justify-end gap-3 pt-2">
-                                    <button 
+                                    <button
                                         type="button"
                                         onClick={() => setEditingVideo(null)}
                                         className="px-4 py-2.5 rounded-xl border border-neutral-800 hover:bg-neutral-900 text-xs font-bold tracking-wide transition-colors cursor-pointer"
                                     >
                                         Cancel
                                     </button>
-                                    <button 
+                                    <button
                                         type="submit"
                                         disabled={actionLoading}
                                         className="bg-blue-600 hover:bg-blue-700 disabled:bg-neutral-800 text-white font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all active:scale-[0.97] cursor-pointer flex items-center gap-1.5 shadow-md"
