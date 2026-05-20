@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 function Channel() {
     const dispatch = useDispatch();
     const { channelData } = useSelector((state) => state.user);
+    
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState({ avatar: false, banner: false });

@@ -11,6 +11,11 @@ API.interceptors.request.use((req) => {
     req.headers.Authorization = `Bearer ${token}`;
   }
   return req;
-});
+},
+(error) => {
+    // Handles client-side request setup errors cleanly
+    return Promise.reject(error);
+  }
+);
 
 export default API;
