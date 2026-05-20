@@ -1,1 +1,4 @@
 node_modules
+# Ignore all videos in the uploads folder
+streamoBE/uploads/videos/
+*.mp4
