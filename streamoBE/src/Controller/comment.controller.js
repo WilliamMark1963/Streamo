@@ -19,7 +19,7 @@ export const addComment = async (req, res) => {
 
         // Populate user details (name, handle, avatar) before sending back to client
         const populatedComment = await Comment.findById(newComment._id)
-            .populate('user', 'name avatar');
+            .populate('user', 'fullName  profilePicture');
 
         return res.status(201).json({
             success: true,
