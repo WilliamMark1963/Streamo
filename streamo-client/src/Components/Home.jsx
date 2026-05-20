@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Loader2, Play } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Loader2, Play, SearchX } from 'lucide-react';
 import API from '../utils/APIintercept';
 
 function Home() {
@@ -9,10 +9,11 @@ function Home() {
     const [loading, setLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState("All");
 
-    // Static placeholder filter categories
+    const location = useLocation();
+    const backendBase = "http://localhost:5000";
     const categories = ["All", "Tech", "Music", "Gaming", "Cooking", "Web Development", "Podcasts"];
 
-    // Fetch the open public video pool
+    // Fetch original media stream collection
     useEffect(() => {
         const fetchHomeFeed = async () => {
             try {
@@ -20,7 +21,6 @@ function Home() {
                 const response = await API.get('/video/all-videos');
                 const videoData = response.data.videos || [];
                 setVideos(videoData);
-                setFilteredVideos(videoData); // Initial view displays everything
             } catch (error) {
                 console.error("Error pulling public feed resources:", error);
             } finally {
@@ -30,17 +30,33 @@ function Home() {
         fetchHomeFeed();
     }, []);
 
-    // Filter processing simulation handler
-const handleFilterClick = (category) => {
-    setActiveFilter(category);
-    if (category === "All") {
-        setFilteredVideos(videos); // Show everything
-    } else {
-        //  Accurate property lookup instead of fuzzy string guessing!
-        const filtered = videos.filter(video => video.category === category);
-        setFilteredVideos(filtered);
-    }
-};
+    // Combine Category Filtering AND URL Search Input Operations combined
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const searchQuery = searchParams.get('q')?.toLowerCase() || "";
+
+        let result = videos;
+
+        // 1. Process category constraint checks
+        if (activeFilter !== "All") {
+            result = result.filter(video => video.category === activeFilter);
+        }
+
+        // 2. Process fuzzy search query title matches
+        if (searchQuery) {
+            result = result.filter(video => 
+                video.title?.toLowerCase().includes(searchQuery) || 
+                video.channel?.name?.toLowerCase().includes(searchQuery) ||
+                video.description?.toLowerCase().includes(searchQuery)
+            );
+        }
+
+        setFilteredVideos(result);
+    }, [videos, activeFilter, location.search]);
+
+    const handleFilterClick = (category) => {
+        setActiveFilter(category);
+    };
 
     if (loading) {
         return (
@@ -50,8 +66,6 @@ const handleFilterClick = (category) => {
             </div>
         );
     }
-
-    const backendBase = "http://localhost:5000";
 
     return (
         <div className="w-full min-h-screen bg-[#0f0f0f] text-white px-4 md:px-12 py-6">
@@ -75,12 +89,15 @@ const handleFilterClick = (category) => {
 
             {/* Empty State Layout Fallback */}
             {filteredVideos.length === 0 ? (
-                <div className="w-full py-20 text-center border border-dashed border-neutral-900 rounded-2xl bg-[#161616]/20">
+                <div className="w-full py-20 flex flex-col items-center justify-center text-center border border-dashed border-neutral-800 rounded-2xl bg-[#161616]/20">
+                    <SearchX className="text-neutral-600 mb-3" size={40} />
                     <p className="text-sm font-semibold text-neutral-400">No matching streaming tracks indexed</p>
-                    <p className="text-xs text-neutral-600 mt-0.5">Try selecting a different filter segment chip above to refresh your viewport canvas.</p>
+                    <p className="text-xs text-neutral-600 mt-0.5 max-w-xs">
+                        We couldn't find anything matching your exact filter setup. Try checking your spelling or clearing active category tags.
+                    </p>
                 </div>
             ) : (
-                /* 2. MAIN RESPONSIVE YOUTUBE-STYLE VIDEO GRID DECK */
+                /* 2. MAIN RESPONSIVE VIDEO GRID DECK */
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 animate-fadeIn">
                     {filteredVideos.map((video) => {
                         const fullThumbnail = video.thumbnailUrl?.startsWith('http') ? video.thumbnailUrl : `${backendBase}${video.thumbnailUrl}`;
@@ -89,7 +106,7 @@ const handleFilterClick = (category) => {
                             <Link 
                                 key={video._id} 
                                 to={`/watch/${video._id}`} 
-                                state={{ videoData: video }} // 👈 Shares the state directly to your VideoPlayerPage
+                                state={{ videoData: video }}
                                 className="group flex flex-col gap-3 cursor-pointer"
                             >
                                 {/* Thumbnail Frame container */}
@@ -109,7 +126,6 @@ const handleFilterClick = (category) => {
 
                                 {/* Channel Info Strip and Metadata Header */}
                                 <div className="flex gap-3 px-1">
-                                    {/* Channel Profile Avatar Circle */}
                                     <div className="w-9 h-9 bg-neutral-800 border border-neutral-900 rounded-full shrink-0 overflow-hidden flex items-center justify-center text-xs font-black uppercase tracking-wider text-neutral-300">
                                         {video.channel?.avatar ? (
                                             <img src={video.channel.avatar?.startsWith('http') ? video.channel.avatar : `${backendBase}${video.channel.avatar}`} alt="" className="w-full h-full object-cover" />
@@ -118,7 +134,6 @@ const handleFilterClick = (category) => {
                                         )}
                                     </div>
 
-                                    {/* Information Frame */}
                                     <div className="space-y-0.5 min-w-0">
                                         <h4 className="text-sm font-bold text-neutral-100 line-clamp-2 leading-snug tracking-tight group-hover:text-blue-400 transition-colors">
                                             {video.title}
