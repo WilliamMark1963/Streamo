@@ -166,7 +166,7 @@ http://localhost:5000
 Add your GitHub repository link here:
 
 ```text
-https://github.com/your-username/streamo
+https://github.com/WilliamMark1963/Streamo.git
 ```
 
 ---
